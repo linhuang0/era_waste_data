@@ -1,19 +1,17 @@
 # era_waste_dataproject
 Waste management data solution for ERA
 
-1.Project env
+1. Create Project env and install some xx
 $ python3 -m venv venv
-$ source env/bin/activate
+$ source venv/bin/activate
 (env)$ deactivate
 
 (env)$ pip3 install django
-pip3 install mysqlclient
+(venv) ➜  pip3 install mysqlclient
 
 mysql -u root -p
 mysql> CREATE DATABASE era_waste CHARACTER SET utf8;
 Query OK, 1 row affected (0.01 sec)
-
-(venv) ➜  pip install mysqlclient
 
 
 python manage.py migrate
