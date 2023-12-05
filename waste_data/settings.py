@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'suppliers',
     'clients',
     'tasks',
-    'invoices'
+    'invoices',
+    'transation',
 ]
 
 MIDDLEWARE = [
