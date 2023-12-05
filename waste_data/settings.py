@@ -76,6 +76,7 @@ WSGI_APPLICATION = 'waste_data.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+import pymysql
 
 DATABASES = {
     'default': {
@@ -83,10 +84,13 @@ DATABASES = {
         'NAME': 'era_waste',
         'USER': 'root',
         'PASSWORD': 'Hello888',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
+
+# Use pymysql as the MySQL database adapter
+pymysql.install_as_MySQLdb()
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
