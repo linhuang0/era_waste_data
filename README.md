@@ -1,12 +1,13 @@
 # era_waste_dataproject
 Waste management data solution for ERA
 
-1.Project env
+1. Create Project env and install some xx
 $ python3 -m venv venv
 $ source venv/bin/activate
 (env)$ deactivate
 
 (env)$ pip3 install django
+
 Windows
 Building mysqlclient on Windows is very hard. But there are some binary wheels you can install easily.
 
@@ -21,11 +22,10 @@ $ brew install mysql-client pkg-config
 $ export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client/lib/pkgconfig"
 $ pip install mysqlclient
 
+
 mysql -u root -p
 mysql> CREATE DATABASE era_waste CHARACTER SET utf8;
 Query OK, 1 row affected (0.01 sec)
-
-(venv) ➜  pip install mysqlclient
 
 
 python manage.py migrate
