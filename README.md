@@ -27,12 +27,13 @@ mysql -u root -p
 mysql> CREATE DATABASE era_waste CHARACTER SET utf8;
 Query OK, 1 row affected (0.01 sec)
 
-
+python manage.py makemigrations
 python manage.py migrate
 mysql> use era_waste
 Database changed
 mysql> show tables;
 
+python manage.py clean_solo
 
 python manage.py runserver 0.0.0.0:8000
 
