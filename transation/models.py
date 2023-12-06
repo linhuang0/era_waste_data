@@ -61,18 +61,6 @@ class WasteStream(models.Model):
         db_table = 'waste_stream'
 
 
-class Invoice(models.Model):
-    invoice_id = models.AutoField(primary_key=True)
-    invoice_number = models.IntegerField()
-    supplier_id = models.IntegerField()
-    customer_id = models.IntegerField()
-    total_amount = models.DecimalField(max_digits=8, decimal_places=2)
-    invoice_date = models.DateField()
-
-    class Meta:
-        managed = True
-        db_table = 'invoice'
-
 
 class QuoteService(models.Model):
     quote_id = models.AutoField(primary_key=True)
@@ -91,7 +79,6 @@ class Service(models.Model):
     service_name = models.CharField(max_length=255)
     container_type = models.CharField(max_length=255)
     uom = models.CharField(max_length=255)
-    service_type = models.CharField(max_length=255)
     weight = models.DecimalField(max_digits=8, decimal_places=2)
 
     class Meta:
@@ -99,6 +86,15 @@ class Service(models.Model):
         db_table = 'service'
 
 
+class SubService(models.Model):
+    sub_service_id = models.AutoField(primary_key=True)
+    service = models.ForeignKey('Service', models.DO_NOTHING)
+    fee_type = models.CharField(max_length=255)
+    charged_by = models.CharField(max_length=255)
+
+    class Meta:
+        managed = True
+        db_table = 'sub_service'
 
 
 class Task(models.Model):
@@ -115,6 +111,18 @@ class Task(models.Model):
     class Meta:
         managed = True
         db_table = 'task'
+
+class Invoice(models.Model):
+    invoice_id = models.AutoField(primary_key=True)
+    invoice_number = models.IntegerField()
+    site = models.ForeignKey(CustomerSite, models.DO_NOTHING)
+    outlet = models.ForeignKey(SupplierOutlet, models.DO_NOTHING)
+    total_amount = models.DecimalField(max_digits=8, decimal_places=2)
+    invoice_date = models.DateField()
+
+    class Meta:
+        managed = True
+        db_table = 'invoice'
 
 
 class Transation(models.Model):
