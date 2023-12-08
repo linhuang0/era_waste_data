@@ -1,6 +1,16 @@
 from django.contrib import admin
 
-from transation.models import Customer
+from transation.models import Customer, CustomerSite, Invoice, MarketServicePrice, Service, Transation, SubService, Supplier, SupplierOutlet, WasteStream
 
 admin.site.register(Customer)
+admin.site.register(CustomerSite)
+admin.site.register(Invoice)
+admin.site.register(MarketServicePrice)
+admin.site.register(Service)
+admin.site.register(SubService)
+admin.site.register(Supplier)
+admin.site.register(SupplierOutlet)
+admin.site.register(WasteStream)
+admin.site.register(Transation)
+
 
