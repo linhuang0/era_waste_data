@@ -30,6 +30,7 @@ Query OK, 1 row affected (0.01 sec)
 python manage.py makemigrations
 python manage.py migrate
 python manage.py clean_solo
+pip install fuzzywuzzy
 
 python manage.py runserver 0.0.0.0:8000
 

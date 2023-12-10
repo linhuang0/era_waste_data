@@ -34,19 +34,6 @@ class CustomerSite(models.Model):
         db_table = 'customer_site'
 
 
-class Invoice(models.Model):
-    invoice_id = models.AutoField(primary_key=True)
-    invoice_date = models.DateField()
-    invoice_number = models.IntegerField()
-    outlet = models.ForeignKey('SupplierOutlet', models.DO_NOTHING)
-    site = models.ForeignKey(CustomerSite, models.DO_NOTHING)
-    total_amount = models.DecimalField(max_digits=8, decimal_places=2)
-
-    class Meta:
-        managed = False
-        db_table = 'invoice'
-
-
 class MarketServicePrice(models.Model):
     service_price_id = models.AutoField(primary_key=True)
     supplier = models.ForeignKey('Supplier', models.DO_NOTHING)
@@ -57,7 +44,7 @@ class MarketServicePrice(models.Model):
     unit_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    phase = models.CharField(max_length=255, blank=True, null=True)
+    stage = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -79,7 +66,7 @@ class Service(models.Model):
 class SubService(models.Model):
     sub_service_id = models.AutoField(primary_key=True)
     service_type = models.CharField(max_length=255, blank=True, null=True)
-    charged_by = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    charged_by = models.CharField(max_length=255, blank=True, null=True)
     service = models.ForeignKey(Service, models.DO_NOTHING)
     unit_of_measure = models.CharField(max_length=255, blank=True, null=True)
     weight = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
@@ -118,12 +105,15 @@ class SupplierOutlet(models.Model):
 
 class Transation(models.Model):
     transation_id = models.AutoField(primary_key=True)
-    invoice = models.ForeignKey(Invoice, models.DO_NOTHING)
+    invoice_date = models.DateField()
+    invoice_number = models.IntegerField()
+    outlet = models.ForeignKey('SupplierOutlet', models.DO_NOTHING)
+    site = models.ForeignKey(CustomerSite, models.DO_NOTHING)
     transation_date = models.DateField()
     quantity = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     weight = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     volume = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    amout = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    unit_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     transation_ref = models.CharField(max_length=255, blank=True, null=True)
     transation_number = models.IntegerField(blank=True, null=True)
     sub_service = models.ForeignKey(SubService, models.DO_NOTHING, blank=True, null=True)
