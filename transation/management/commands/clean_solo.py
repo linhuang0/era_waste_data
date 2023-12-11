@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from fuzzywuzzy import fuzz,process
 
-from transation.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transation
+from transation.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transation,EraStandardTerm
 
 class Command(BaseCommand):
     help = 'Function to read customer data from an Excel file and add to the database.'
@@ -12,22 +12,30 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             #Add ERA Term data
-            mapping_file_path = os.path.join(settings.MEDIA_ROOT, 'Mapping Table.xlsx')
-            mappingdf=pd.read_excel(mapping_file_path)  
+            #mapping_file_path = os.path.join(settings.MEDIA_ROOT, 'Mapping Table.xlsx')
+            #mappingdf=pd.read_excel(mapping_file_path)  
+            # Load ERA Term data from the database
+            era_standard_terms = list(EraStandardTerm.objects.values(
+                'era_desc', 'stream_name', 'container', 'sizem3', 'uom', 'activity'
+            ))
+            # Create a DataFrame from the database data
+            mappingdf = pd.DataFrame(era_standard_terms)
+
+
             for index, row in mappingdf.iterrows():
                 wasteStream, created = WasteStream.objects.get_or_create(
-                        stream_name=str(row['Stream']),
+                        stream_name=str(row['stream_name']),
                     )
                 service, created = Service.objects.get_or_create(
-                        service_name=str(row['Description']),
+                        service_name=str(row['era_desc']),
                         sub_stream=wasteStream,
-                        container_type=str(row['Container']),
-                        size=str(row['SizeM3']),
+                        container_type=str(row['container']),
+                        size=str(row['sizem3']),
                     )
                 subService, created = SubService.objects.get_or_create(
-                        service_type=str(row['Activity']),
+                        service_type=str(row['activity']),
                         service=service,
-                        unit_of_measure=str(row['UoM']),
+                        unit_of_measure=str(row['uom']),
                     )
                 
 
@@ -99,14 +107,8 @@ class Command(BaseCommand):
                             outlet=outlet,
                         )
                     else:
-                        print(f"Desc: {row['Desc']} not found in mapping table")
-                        
-                        # Append a new row to mappingdf
-                        new_row = pd.DataFrame({'Description': [row['Desc']]})
-                        mappingdf = pd.concat([mappingdf, new_row], ignore_index=True)
-
-                        # Save the updated DataFrame to the Excel file
-                        mappingdf.to_excel(mapping_file_path, index=False)
+                        print(f"Desc: {row['Desc']} not found in ERA strandard term")
+                        handle_unmatched_data(row['Desc'])
 
             self.stdout.write(self.style.SUCCESS('Data imported successfully'))
 
@@ -163,3 +165,22 @@ class Command(BaseCommand):
 
         # If the matching scores don't meet the threshold, return None
         return None
+
+def handle_unmatched_data(desc):
+    # Append a new row to mappingdf
+    try:
+        # Create a new EraStandardTerm record for the unmatched data
+        era_standard_term = EraStandardTerm.objects.create(
+            era_desc=str(desc),
+            stream_name='',  # Set appropriate default values for other fields
+            container='',
+            sizem3=0.0,
+            uom='',
+            activity='',
+        )
+
+        print(f"Unmatched data for description '{desc}' saved to EraStandardTerm table.")
+
+    except Exception as e:
+        print(f"Error saving unmatched data to EraStandardTerm table: {str(e)}")
+

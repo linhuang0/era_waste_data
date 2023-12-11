@@ -133,3 +133,17 @@ class WasteStream(models.Model):
     class Meta:
         managed = False
         db_table = 'waste_stream'
+
+
+class EraStandardTerm(models.Model):
+    era_id = models.AutoField(primary_key=True)
+    era_desc = models.CharField(max_length=255)
+    stream_name = models.CharField(max_length=255, blank=True, null=True)
+    container = models.CharField(max_length=255, blank=True, null=True)
+    sizem3 = models.FloatField(blank=True, null=True)
+    uom = models.CharField(max_length=255, blank=True, null=True)
+    activity = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'era_standard_term'
