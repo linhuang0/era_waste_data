@@ -143,7 +143,7 @@ def handle_unmatched_data(desc):
     # Append a new row to mappingdf
     try:
         # Create a new EraStandardTerm record for the unmatched data
-        era_standard_term = EraStandardTerm.objects.create(
+        era_standard_term = EraStandardTerm.objects.get_or_create(
             era_desc=str(desc),
             stream_name='',  # Set appropriate default values for other fields
             container='',
