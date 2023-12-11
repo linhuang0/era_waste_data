@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from fuzzywuzzy import fuzz,process
+from fuzzywuzzy import process
 
 from transation.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transation,EraStandardTerm
 
@@ -11,33 +11,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            #Add ERA Term data
-            #mapping_file_path = os.path.join(settings.MEDIA_ROOT, 'Mapping Table.xlsx')
-            #mappingdf=pd.read_excel(mapping_file_path)  
-            # Load ERA Term data from the database
-            era_standard_terms = list(EraStandardTerm.objects.values(
-                'era_desc', 'stream_name', 'container', 'sizem3', 'uom', 'activity'
-            ))
-            # Create a DataFrame from the database data
-            mappingdf = pd.DataFrame(era_standard_terms)
-
-
-            for index, row in mappingdf.iterrows():
-                wasteStream, created = WasteStream.objects.get_or_create(
-                        stream_name=str(row['stream_name']),
-                    )
-                service, created = Service.objects.get_or_create(
-                        service_name=str(row['era_desc']),
-                        sub_stream=wasteStream,
-                        container_type=str(row['container']),
-                        size=str(row['sizem3']),
-                    )
-                subService, created = SubService.objects.get_or_create(
-                        service_type=str(row['activity']),
-                        service=service,
-                        unit_of_measure=str(row['uom']),
-                    )
-                
 
             # Load wasteStream, service, and subService data from the database
             waste_stream_df = pd.DataFrame(list(WasteStream.objects.values('stream_name')))

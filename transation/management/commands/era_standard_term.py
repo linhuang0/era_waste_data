@@ -1,5 +1,3 @@
-# ear_standard_term.py
-
 import os
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -11,15 +9,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            # Add ERA Term data
             mapping_file_path = os.path.join(settings.MEDIA_ROOT, 'Mapping Table.xlsx')
             mappingdf = pd.read_excel(mapping_file_path)
 
             for index, row in mappingdf.iterrows():
-                # Handling NaN values
                 row = row.where(pd.notna(row), None)
 
-                # Use get_or_create to ensure uniqueness based on specified fields
                 era_standard_term, created = EraStandardTerm.objects.get_or_create(
                     era_desc=str(row['Description']),
                     stream_name=str(row['Stream']),
@@ -29,7 +24,24 @@ class Command(BaseCommand):
                     activity=str(row['Activity']),
                 )
 
-            self.stdout.write(self.style.SUCCESS('ERA Term data imported successfully'))
+                waste_stream, _ = WasteStream.objects.get_or_create(
+                    stream_name=str(row['Stream']),
+                )
+
+                service, _ = Service.objects.get_or_create(
+                    service_name=str(row['Description']),
+                    sub_stream=waste_stream,
+                    container_type=str(row['Container']),
+                    size=str(row['SizeM3']),
+                )
+
+                _, _ = SubService.objects.get_or_create(
+                    service_type=str(row['Activity']),
+                    service=service,
+                    unit_of_measure=str(row['UoM']),
+                )
+
+            self.stdout.write(self.style.SUCCESS('ERA Term and related data imported successfully'))
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Error: {str(e)}'))
