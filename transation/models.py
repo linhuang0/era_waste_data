@@ -78,7 +78,7 @@ class SubService(models.Model):
 class Supplier(models.Model):
     supplier_id = models.AutoField(primary_key=True)
     supplier_name = models.CharField(max_length=255)
-    supplier_number = models.IntegerField(blank=True, null=True)
+    supplier_number = models.CharField(max_length=255, blank=True, null=True)
     parent_company_name = models.CharField(max_length=255, blank=True, null=True)
     last_known_sup_id = models.IntegerField(blank=True, null=True)
 
@@ -95,7 +95,7 @@ class SupplierOutlet(models.Model):
     suburb_or_town = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
-    outlet_number = models.IntegerField(blank=True, null=True)
+    outlet_number = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -105,7 +105,7 @@ class SupplierOutlet(models.Model):
 class Transation(models.Model):
     transation_id = models.AutoField(primary_key=True)
     invoice_date = models.DateField()
-    invoice_number = models.CharField(max_length=255)
+    invoice_number = models.CharField(max_length=255, blank=True, null=True)
     outlet = models.ForeignKey('SupplierOutlet', models.DO_NOTHING)
     site = models.ForeignKey(CustomerSite, models.DO_NOTHING)
     transation_date = models.DateField()
@@ -114,7 +114,7 @@ class Transation(models.Model):
     volume = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     unit_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     transation_ref = models.CharField(max_length=255, blank=True, null=True)
-    transation_number = models.CharField(max_length=255)
+    transation_number = models.CharField(max_length=255, blank=True, null=True)
     
     sub_service = models.ForeignKey(SubService, models.DO_NOTHING, blank=True, null=True)
 
