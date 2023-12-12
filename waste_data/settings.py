@@ -84,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'era_waste',
         'USER': 'root',
-        'PASSWORD': 'Hello888',
+        'PASSWORD': 'root-8888',
         'HOST': 'localhost',
         'PORT': '3306',
     }
