@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from fuzzywuzzy import process
 
-from transation.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transation,EraStandardTerm
+from transaction.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transaction,EraStandardTerm
 
 class Command(BaseCommand):
     help = 'Function to read customer data from an Excel file and add to the database.'
@@ -89,7 +89,7 @@ class Command(BaseCommand):
                             unit_of_measure=str(best_match_row['unit_of_measure'])
                         )
 
-                    transation, created = Transation.objects.get_or_create(
+                    transaction, created = Transaction.objects.get_or_create(
                         transation_date=row['Transaction Date'],
                         quantity=float(row['No. Units Serviced']),
                         unit_amount=float(row['Unit Amount']),

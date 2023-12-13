@@ -102,7 +102,7 @@ class SupplierOutlet(models.Model):
         db_table = 'supplier_outlet'
 
 
-class Transation(models.Model):
+class Transaction(models.Model):
     transation_id = models.AutoField(primary_key=True)
     invoice_date = models.DateField()
     invoice_number = models.CharField(max_length=255, blank=True, null=True)

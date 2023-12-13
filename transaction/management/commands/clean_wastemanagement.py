@@ -7,7 +7,7 @@ from django.db import transaction
 
 
 
-from transation.models import Customer, CustomerSite, Supplier, SupplierOutlet, WasteStream, Service, SubService, Transation
+from transaction.models import Customer, CustomerSite, Supplier, SupplierOutlet, WasteStream, Service, SubService, Transaction
 
 class Command(BaseCommand):
     help = 'Load WasteManagement data from an Excel file into the MySQL database.'
@@ -56,14 +56,22 @@ class Command(BaseCommand):
                     defaults={'sub_stream': waste_stream}
                 )
 
+                if sub_service.exists():
+                    subService = sub_services.first()  # Choose the first match or implement other logic
+                else:
+                    subService = SubService.objects.create(
+                        service=service,
+                        service_type=str(best_match_row['service_type']),
+                        unit_of_measure=str(best_match_row['unit_of_measure'])
+                    )
                 # Get or create the SubService instance
                 sub_service, _ = SubService.objects.get_or_create(
                     service_type=row['Action'],
                     defaults={'service': service}
                 )
 
-                # Create or update the Transation instance
-                transation, _ = Transation.objects.update_or_create(
+                # Create or update the Transaction instance
+                transaction, _ = Transaction.objects.update_or_create(
                     invoice_number=row['Invoice Number'],
                     defaults={
                         'invoice_date': pd.to_datetime(row['Invoice Date']),

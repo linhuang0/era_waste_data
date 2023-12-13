@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from fuzzywuzzy import process
 
-from transation.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transation,EraStandardTerm
+from transaction.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transaction,EraStandardTerm
 
 class Command(BaseCommand):
     help = 'Function to read customer data from an Excel file and add to the database.'
@@ -18,79 +18,67 @@ class Command(BaseCommand):
             sub_service_df = pd.DataFrame(list(SubService.objects.values('service_type', 'unit_of_measure')))
 
             # Read supplier data
-            supplier_file_path = os.path.join(settings.MEDIA_ROOT, '05_Veolia  invoice june 2023 (005).xlsx')
+            supplier_file_path = os.path.join(settings.MEDIA_ROOT, '06_URM_Oct - Jan 2022 Service summary.xlsm')
             # Use pandas to read Excel data
             df = pd.read_excel(supplier_file_path)
             # Use pandas to read Excel data from all sheets
             xls = pd.ExcelFile(supplier_file_path)
             all_sheets_data = pd.read_excel(xls, sheet_name=None)
         
-            
+            # Set the supplier 
             supplier, created = Supplier.objects.get_or_create(
-                    supplier_name='Veolia',
+                    supplier_name = 'URM',
                 )
 
-            # Loop through all sheets
-            for sheet_name, df in all_sheets_data.items():
-                #self.stdout.write(self.style.SUCCESS(f'Sheet name: {sheet_name}'))
-                for index, row in df.iterrows():
-                    
-                    #Get or create customer and supplier
-                    customer, created = Customer.objects.get_or_create(
-                        customer_name=str(row['Sold to Party Name']),                
-                        customer_number=str(row['Payer #']),
-                        )
-                    
-                    # Clean customer site info. Use "Task Site" as site_name, Use get_or_create to avoid duplicates
-                    customerSite, created = CustomerSite.objects.get_or_create(
-                        site_name=str(row['Sold to Party Name']),
-                        customer=customer,
-                        site_address=str(row['House Number Street']),
-                        site_number=str(row['Sold to Party #']),
-                        
-                        # Extract the city and store in the 'city' variable
-                        city=str(row['Sold to Party Name'].split(' - ')[0]),
+            
+            for index, row in df.iterrows():
+                #Get or create customer and
+                customer, created = Customer.objects.get_or_create(
+                    customer_name ='Sydney sites'
+                    parent_company_name='Norths Collective',
+                )
+
+                # Clean customer site info. Use "Address 1" as outlet_address, "City" as city
+                customerSite, created = CustomerSite.objects.get_or_create(
+                    site_name = str(row['Customer Name'])
+                    site_address = str(row['Address 1']),
+                    site_number=str(row['Customer number']),
+                    city = str(row['City']),
+                    customer = customer,
+                )
+
+                # Clean waste, service, and subService data.
+                #print(f"Desc: {row['Desc']}")
+                best_match_row = self.find_best_match(row['Desc'], waste_stream_df, service_df, sub_service_df)
+                #print(f"Desc: {best_match_row}")
+
+                if best_match_row is not None:
+                    wasteStream, created = WasteStream.objects.get_or_create(
+                        stream_name=str(best_match_row['Waste Type']),
                     )
-
-                    
-
-                    outlet, created = SupplierOutlet.objects.get_or_create(
-                        outlet_name='Veolia',
-                        supplier=supplier,
+                    service, created = Service.objects.get_or_create(
+                        service_name=str(best_match_row['service_name']),
+                        sub_stream=wasteStream,
+                        container_type=str(best_match_row['Container Type']),
+                        size=str(best_match_row['size']),
                     )
-
-                    # Clean waste, service, and subService data.
-                    #print(f"Desc: {row['Desc']}")
-                    best_match_row = self.find_best_match(row['Contract description'], waste_stream_df, service_df, sub_service_df)
-                    #print(f"Desc: {best_match_row}")
-
-                    if best_match_row is not None:
-                        wasteStream, created = WasteStream.objects.get_or_create(
-                            stream_name=str(best_match_row['stream_name']),
-                        )
-                        service, created = Service.objects.get_or_create(
-                            service_name=str(best_match_row['service_name']),
-                            sub_stream=wasteStream,
-                            container_type=str(best_match_row['container_type']),
-                            size=str(best_match_row['size']),
-                        )
-                        subService, created = SubService.objects.get_or_create(
-                            service_type=str(best_match_row['service_type']),
-                            service=service,
-                            unit_of_measure=str(best_match_row['unit_of_measure']),
-                            #charged_by=str(row['UOM']),
-                        )
-                        transation, created = Transation.objects.get_or_create(
-                            transation_date=row['Serv.rendered date'],
-                            quantity=float(row['No. of Containers from WDOI']),
-                            unit_amount=float(row['Rate per UOM']),
-                            sub_service=subService,
-                            site=customerSite,
-                            outlet=outlet,
-                        )
-                    else:
-                        print(f"Contract description: {row['Contract description']} not found in ERA strandard term")
-                        handle_unmatched_data(row['Contract description'])
+                    subService, created = SubService.objects.get_or_create(
+                        service_type=str(best_match_row['service_type']),
+                        service=service,
+                        unit_of_measure=str(best_match_row['unit_of_measure']),
+                        charged_by=str(row['UOM']),
+                    )
+                    transaction, created = Transaction.objects.get_or_create(
+                        transation_date=row['Task Date'],
+                        quantity=float(row['Qty']),
+                        unit_amount=float(row['Unit Price']),
+                        sub_service=subService,
+                        site=customerSite,
+                        outlet=outlet,
+                    )
+                else:
+                    print(f"Desc: {row['Desc']} not found in ERA strandard term")
+                    handle_unmatched_data(row['Desc'])
 
             self.stdout.write(self.style.SUCCESS('Data imported successfully'))
 
@@ -165,4 +153,3 @@ def handle_unmatched_data(desc):
 
     except Exception as e:
         print(f"Error saving unmatched data to EraStandardTerm table: {str(e)}")
-

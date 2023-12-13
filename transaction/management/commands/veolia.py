@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from fuzzywuzzy import process
 
-from transation.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transation,EraStandardTerm
+from transaction.models import Customer,Supplier,CustomerSite,SupplierOutlet,WasteStream,Service,SubService,MarketServicePrice,Transaction,EraStandardTerm
 
 class Command(BaseCommand):
     help = 'Function to read customer data from an Excel file and add to the database.'
@@ -18,41 +18,50 @@ class Command(BaseCommand):
             sub_service_df = pd.DataFrame(list(SubService.objects.values('service_type', 'unit_of_measure')))
 
             # Read supplier data
-            supplier_file_path = os.path.join(settings.MEDIA_ROOT, '07_Solo_seagulls october 2022 - december 2022.xlsx')
+            supplier_file_path = os.path.join(settings.MEDIA_ROOT, '05_Veolia  invoice june 2023 (005).xlsx')
             # Use pandas to read Excel data
             df = pd.read_excel(supplier_file_path)
             # Use pandas to read Excel data from all sheets
             xls = pd.ExcelFile(supplier_file_path)
             all_sheets_data = pd.read_excel(xls, sheet_name=None)
         
-            #Get or create customer and supplier
-            customer, created = Customer.objects.get_or_create(
-                    customer_name='Seagulls',
-                    parent_company_name='Norths Collective',
-                    #customer_number=row['Customer Number']
-                )
+            
             supplier, created = Supplier.objects.get_or_create(
-                    supplier_name='Solo',
+                    supplier_name='Veolia',
                 )
 
             # Loop through all sheets
             for sheet_name, df in all_sheets_data.items():
                 #self.stdout.write(self.style.SUCCESS(f'Sheet name: {sheet_name}'))
                 for index, row in df.iterrows():
+                    
+                    #Get or create customer and supplier
+                    customer, created = Customer.objects.get_or_create(
+                        customer_name=str(row['Sold to Party Name']),                
+                        customer_number=str(row['Payer #']),
+                        )
+                    
                     # Clean customer site info. Use "Task Site" as site_name, Use get_or_create to avoid duplicates
                     customerSite, created = CustomerSite.objects.get_or_create(
-                        site_name=str(row['Task Site']),
+                        site_name=str(row['Sold to Party Name']),
                         customer=customer,
+                        site_address=str(row['House Number Street']),
+                        site_number=str(row['Sold to Party #']),
+                        
+                        # Extract the city and store in the 'city' variable
+                        city=str(row['Sold to Party Name'].split(' - ')[0]),
                     )
 
+                    
+
                     outlet, created = SupplierOutlet.objects.get_or_create(
-                        outlet_name='Solo',
+                        outlet_name='Veolia',
                         supplier=supplier,
                     )
 
                     # Clean waste, service, and subService data.
                     #print(f"Desc: {row['Desc']}")
-                    best_match_row = self.find_best_match(row['Desc'], waste_stream_df, service_df, sub_service_df)
+                    best_match_row = self.find_best_match(row['Contract description'], waste_stream_df, service_df, sub_service_df)
                     #print(f"Desc: {best_match_row}")
 
                     if best_match_row is not None:
@@ -69,19 +78,19 @@ class Command(BaseCommand):
                             service_type=str(best_match_row['service_type']),
                             service=service,
                             unit_of_measure=str(best_match_row['unit_of_measure']),
-                            charged_by=str(row['UOM']),
+                            #charged_by=str(row['UOM']),
                         )
-                        transation, created = Transation.objects.get_or_create(
-                            transation_date=row['Task Date'],
-                            quantity=float(row['Qty']),
-                            unit_amount=float(row['Unit Price']),
+                        transaction, created = Transaction.objects.get_or_create(
+                            transaction_date=row['Serv.rendered date'],
+                            quantity=float(row['No. of Containers from WDOI']),
+                            unit_amount=float(row['Rate per UOM']),
                             sub_service=subService,
                             site=customerSite,
                             outlet=outlet,
                         )
                     else:
-                        print(f"Desc: {row['Desc']} not found in ERA strandard term")
-                        handle_unmatched_data(row['Desc'])
+                        print(f"Contract description: {row['Contract description']} not found in ERA strandard term")
+                        handle_unmatched_data(row['Contract description'])
 
             self.stdout.write(self.style.SUCCESS('Data imported successfully'))
 
