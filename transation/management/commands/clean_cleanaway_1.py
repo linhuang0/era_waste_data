@@ -18,33 +18,38 @@ class Command(BaseCommand):
             sub_service_df = pd.DataFrame(list(SubService.objects.values('service_type', 'unit_of_measure')))
 
             # Read supplier data
-            #supplier_file_path = os.path.join(settings.MEDIA_ROOT, '01_Cleanaway_Charles Sturt University Waste Report August 2023.xlsb')
-            supplier_file_path = os.path.join(settings.MEDIA_ROOT, '02_Cleanaway_FY 23 Rockhampton Grammer school Report Jan 2023.xlsm')
-            
+            supplier_file_path = os.path.join(settings.MEDIA_ROOT, '01_Cleanaway_Charles Sturt University Waste Report August 2023.xlsb')
+           
             # Use pandas to read Excel data
             df = pd.read_excel(supplier_file_path)
             # Use pandas to read Excel data from all sheets
             xls = pd.ExcelFile(supplier_file_path)
-            sheets_data = pd.read_excel(xls, sheet_name='Transaction Data', skiprows=[0, 1], engine='openpyxl')
-        
+            # Read data from both 'Detail1' and 'Detail2' sheets
+            sheets_data_detail1 = pd.read_excel(xls, sheet_name='Detail1', skiprows=[0, 1])
+            sheets_data_detail2 = pd.read_excel(xls, sheet_name='Detail2', skiprows=[0, 1])
+
+            # Combine data from both sheets into one DataFrame
+            sheets_data = pd.concat([sheets_data_detail1, sheets_data_detail2], ignore_index=True)
+
             #Get or create customer and supplier
-            customer, created = Customer.objects.get_or_create(
-                    customer_name='Rockhampton Grammer School',
-                    #customer_number=row['Customer Number']
-                )
             supplier, created = Supplier.objects.get_or_create(
                     supplier_name='Cleanaway',
                 )
 
-            
             for index, row in sheets_data.iterrows():
                 #print(f'{sheets_data}')
+                customer, created = Customer.objects.get_or_create(
+                    customer_name=str(row['Customer Entity']),
+                    parent_company_name='Charles Sturt University'
+                    #customer_number=row['Customer Number']
+                )
                 # Clean customer site info. Use "Task Site" as site_name, Use get_or_create to avoid duplicates
                 customerSite, created = CustomerSite.objects.get_or_create(
-                    site_name=str(row['Site Name']),
+                    site_name=str(row['Ship to Name']),
                     site_number=str(row['Account Number']),
                     customer=customer,
-                    city=str(row['Site City']),
+                    city=str(row['Ship to City']),
+                    state=str(row['Ship to State']),
                 )
 
                 outlet, created = SupplierOutlet.objects.get_or_create(
@@ -55,7 +60,7 @@ class Command(BaseCommand):
                 # Clean waste, service, and subService data.
                 #print(f"Desc: {row['Description']}")
                 #print(f"Desc: {waste_stream_df}")
-                best_match_row = self.find_best_match(row['Description'],row['Waste Category'],row['Volume (m3)'], waste_stream_df, service_df, sub_service_df)
+                best_match_row = self.find_best_match(row['Description'],row['Waste Stream'],row['Volume (m3)'], waste_stream_df, service_df, sub_service_df)
                 #print(f"Desc: {best_match_row}")
 
                 if best_match_row is not None:
@@ -93,6 +98,8 @@ class Command(BaseCommand):
                         outlet=outlet,
                         volume=float(row['Volume (m3)']),
                         weight=float(row['Weight\n(kg)']),
+                        transation_ref=row['Reference'],
+                        invoice_number=row['Invoice Number'],
                     )
                 else:
                     print(f"{row['Description']} / {row['Waste Stream']} not found in ERA strandard term")
@@ -147,9 +154,6 @@ class Command(BaseCommand):
             'service_type': matched_row_sub_service['service_type'],
             'unit_of_measure': matched_row_sub_service['unit_of_measure']
         }
-
-
-
 
 
 def handle_unmatched_data(desc,waste_stream):

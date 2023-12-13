@@ -34,12 +34,14 @@ class Command(BaseCommand):
             for index, row in df.iterrows():
                 #Get or create customer and
                 customer, created = Customer.objects.get_or_create(
-                    customer_name = str(row['Customer Name'])
+                    customer_name ='Sydney sites'
+                    parent_company_name='Norths Collective',
                 )
 
                 # Clean customer site info. Use "Address 1" as outlet_address, "City" as city
                 customerSite, created = CustomerSite.objects.get_or_create(
-                    outlet_address = str(row['Address 1']),
+                    site_name = str(row['Customer Name'])
+                    site_address = str(row['Address 1']),
                     city = str(row['City']),
                     customer = customer,
                 )
