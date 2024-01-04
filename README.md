@@ -1,4 +1,4 @@
-# ERA waste data project
+### ERA waste data project
 Waste management data solution for ERA
 
 1. Create Project env and install some xx
