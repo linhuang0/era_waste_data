@@ -82,12 +82,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'era_waste',
-        'USER': 'root',
-        'PASSWORD': 'root-8888',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': 'calina',
+        'PASSWORD': 'Era11-02',
+        'HOST': 'era-mysql.mysql.database.azure.com',
+        'PORT': '3306'
     }
 }
+
 
 # Use pymysql as the MySQL database adapter
 pymysql.install_as_MySQLdb()
