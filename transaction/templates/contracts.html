@@ -27,6 +27,20 @@
         <button type="submit">Submit</button>
     </form>
 </div>
+
+{% if success_message %}
+    <div class="alert alert-success" role="alert">
+        {{ success_message }}
+    </div>
+    {% endif %}
+
+    {% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        <strong>Error!</strong> Data could not be processed successfully. You can download the error data below.
+        <a href="{% url 'download_errors' %}" class="btn btn-danger ml-2">Download Error Data</a>
+    </div>
+    {% endif %}
+    
 </main>
 
 {% endblock content %}

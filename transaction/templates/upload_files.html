@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Deals
+{% endblock title %}
+{% block content %}
+    
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Upload files</h1>
+</div>
+
+<div class="mb-3">
+    <form method="post" enctype="multipart/form-data" action="{% url 'upload_files' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input class="form-control" id="formFile" type="file" name="excel_file">
+            <input type="hidden" name="uploaded_file_name" value="{{ uploaded_file_name }}">    
+        </div>
+        <div class="col-auto"><button type="submit" class="btn btn-primary mb-3"> Submit</button></div>
+    </form>
+
+    {% if success_message and not confirmation_required %}
+    <div class="alert alert-success" role="alert">
+        {{ success_message }}
+    </div>
+    {% endif %}
+
+    {% if confirmation_required %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Warning!</strong> A file with the same name already exists. Do you want to overwrite it?
+        <form method="post" action="{% url 'upload_files' %}">
+            {% csrf_token %}
+            <input type="hidden" name="confirmation" value="confirm">
+            <input type="hidden" name="file_name" value="{{ file_name }}">
+            <input type="hidden" name="uploaded_file" value="{{ uploaded_file }}">
+            <button type="submit" class="btn btn-warning ml-2">Yes, Overwrite</button>
+        </form>
+        
+        <form method="post" action="{% url 'upload_files' %}">
+            {% csrf_token %}
+            <input type="hidden" name="confirmation" value="save_as_new">
+            <input type="hidden" name="file_name" value="{{ file_name }}">
+            <input type="hidden" name="uploaded_file" value="{{ uploaded_file }}">
+            <button type="submit" class="btn btn-secondary ml-2">No, Save as a new file</button>
+        </form>
+    </div>
+    {% endif %}
+
+
+</div>
+
+{% if error_message%}
+    <div class="alert alert-danger" role="alert">
+        <strong>Error!</strong> File could not be processed successfully. Please try again later.
+    </div>
+{% endif %}
+    
+</main>
+
+{% endblock content %}
