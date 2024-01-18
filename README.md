@@ -7,6 +7,7 @@ $ source venv/bin/activate
 (env)$ deactivate
 
 (env)$ pip3 install django
+python manage.py inspectdb
 
 Windows
 Building mysqlclient on Windows is very hard. But there are some binary wheels you can install easily.
@@ -31,6 +32,7 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py clean_solo
 pip install fuzzywuzzy
+pip install pyxlsb
 
 python manage.py runserver 0.0.0.0:8000
 

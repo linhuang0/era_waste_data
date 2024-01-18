@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%b%@v(o2&b=ymhb#yany7a%du9cm@@8m#v*u&-$9@*&t4=ahjw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,9 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'suppliers',
     'clients',
-    'tasks',
     'invoices',
-    'transation',
+    'transaction',
 ]
 
 MIDDLEWARE = [
@@ -83,12 +82,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'era_waste',
-        'USER': 'root',
-        'PASSWORD': 'Hello888',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': 'calina',
+        'PASSWORD': 'Era11-02',
+        'HOST': 'era-mysql.mysql.database.azure.com',
+        'PORT': '3306'
     }
 }
+
 
 # Use pymysql as the MySQL database adapter
 pymysql.install_as_MySQLdb()
