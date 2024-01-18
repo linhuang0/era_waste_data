@@ -1,4 +1,4 @@
-### ERA waste data project
+# ERA waste data project
 Waste management data solution for ERA
 
 1. Create Project env and install some xx
@@ -7,6 +7,7 @@ $ source venv/bin/activate
 (env)$ deactivate
 
 (env)$ pip3 install django
+python manage.py inspectdb
 
 Windows
 Building mysqlclient on Windows is very hard. But there are some binary wheels you can install easily.
