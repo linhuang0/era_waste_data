@@ -25,6 +25,7 @@ $ pip install mysqlclient
 
 
 mysql -u root -p
+# mysql.exe -u calina -p -h era-mysql.mysql.database.azure.com -P 3306  ## in windows
 mysql> CREATE DATABASE era_waste CHARACTER SET utf8;
 Query OK, 1 row affected (0.01 sec)
 
