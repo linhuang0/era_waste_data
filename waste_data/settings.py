@@ -37,9 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'suppliers',
-    'clients',
-    'invoices',
     'transaction',
 ]
 
@@ -51,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
 ROOT_URLCONF = 'waste_data.urls'
@@ -82,9 +80,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'era_waste',
-        'USER': 'calina',
-        'PASSWORD': 'Era11-02',
-        'HOST': 'era-mysql.mysql.database.azure.com',
+        'USER': 'root',
+        'PASSWORD': 'Hello888',
+        'HOST': 'localhost',
         'PORT': '3306'
     }
 }

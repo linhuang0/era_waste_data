@@ -14,6 +14,8 @@ class Customer(models.Model):
     customer_number = models.CharField(max_length=255, blank=True, null=True)
     parent_company_name = models.CharField(max_length=255, blank=True, null=True)
     last_known_cx_id = models.IntegerField(blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -29,6 +31,8 @@ class CustomerSite(models.Model):
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
     site_number = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -42,6 +46,8 @@ class EraStandardTerm(models.Model):
     sizem3 = models.CharField(max_length=255, blank=True, null=True)
     uom = models.CharField(max_length=255, blank=True, null=True)
     activity = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -56,14 +62,16 @@ class MarketServicePrice(models.Model):
     stream_id = models.IntegerField(blank=True, null=True)
     service = models.ForeignKey('Service', models.DO_NOTHING)
     type = models.ForeignKey('ServiceType', models.DO_NOTHING, blank=True, null=True)
-    qty_scheduled = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    qty_scheduled = models.CharField(max_length=255, blank=True, null=True)
     frequency = models.CharField(max_length=255, blank=True, null=True)
-    unit_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
+    unit_price = models.CharField(max_length=255, blank=True, null=True)
+    start_date = models.CharField(max_length=255, blank=True, null=True)
+    end_date = models.CharField(max_length=255, blank=True, null=True)
     stage = models.CharField(max_length=255, blank=True, null=True)
     route_schedule = models.CharField(max_length=255, blank=True, null=True)
     days = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -75,6 +83,8 @@ class Service(models.Model):
     service_name = models.CharField(max_length=255)
     container_type = models.CharField(max_length=255, blank=True, null=True)
     size = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -85,7 +95,9 @@ class ServiceType(models.Model):
     type_id = models.AutoField(primary_key=True)
     fee_type = models.CharField(max_length=255, blank=True, null=True)
     unit_of_measure = models.CharField(max_length=255, blank=True, null=True)
-    weight = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    weight = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -98,6 +110,8 @@ class Supplier(models.Model):
     supplier_number = models.CharField(max_length=255, blank=True, null=True)
     parent_company_name = models.CharField(max_length=255, blank=True, null=True)
     last_known_sup_id = models.IntegerField(blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -113,6 +127,8 @@ class SupplierOutlet(models.Model):
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, blank=True, null=True)
     outlet_number = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -122,12 +138,12 @@ class SupplierOutlet(models.Model):
 class TransactionDetail(models.Model):
     transaction_id = models.AutoField(primary_key=True)
     invoice_number = models.CharField(max_length=255, blank=True, null=True)
-    invoice_date = models.DateField(blank=True, null=True)
-    transaction_date = models.DateField()
-    quantity = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    weight = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    volume = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    unit_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    invoice_date = models.CharField(max_length=255, blank=True, null=True)
+    transaction_date = models.CharField(max_length=255, blank=True, null=True)
+    quantity = models.CharField(max_length=255, blank=True, null=True)
+    weight = models.CharField(max_length=255, blank=True, null=True)
+    volume = models.CharField(max_length=255, blank=True, null=True)
+    unit_amount = models.CharField(max_length=255, blank=True, null=True)
     transaction_ref = models.CharField(max_length=255, blank=True, null=True)
     transaction_number = models.CharField(max_length=255, blank=True, null=True)
     stream = models.ForeignKey('WasteStream', models.DO_NOTHING)
@@ -135,6 +151,8 @@ class TransactionDetail(models.Model):
     type = models.ForeignKey(ServiceType, models.DO_NOTHING, blank=True, null=True)
     outlet = models.ForeignKey(SupplierOutlet, models.DO_NOTHING)
     site = models.ForeignKey(CustomerSite, models.DO_NOTHING)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -147,6 +165,8 @@ class WasteStream(models.Model):
     stream_name = models.CharField(max_length=255)
     sub_stream_name = models.CharField(max_length=255, blank=True, null=True)
     sub_stream_code = models.CharField(max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
